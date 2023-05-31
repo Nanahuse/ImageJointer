@@ -5,7 +5,7 @@
     
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     green = Image.new("RGBA", (100, 100), (0, 255, 0))
-    blue = Image.new("RGBA", (200, 100), (0, 0, 255))
+    blue = Image.new("RGBA", (100, 100), (0, 0, 255))
 
     jointed = (
         ImageJointer(red)
