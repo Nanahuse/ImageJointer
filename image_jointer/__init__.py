@@ -4,4 +4,7 @@
 
 # flake8: noqa
 
-from image_jointer.image_jointer import ImageJointer, Aline, Position, Blank
+from .image_jointer import ImageJointer
+from .blank import Blank
+from .enums import JointAlign, PositionAlign
+from .vector import Vector
