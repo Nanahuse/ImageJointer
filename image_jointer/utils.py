@@ -1,0 +1,62 @@
+from __future__ import annotations
+
+from .blank import Blank
+from .enums import JointAlign, PositionAlign
+from .interfaces import iSize
+from .image_jointer import ImageJointer
+
+
+class Utility(object):
+    def __init__(
+        self,
+    ):
+        raise NotImplementedError("Cannot construct")
+
+    @staticmethod
+    def adjust_size(inputs: tuple[iSize] | list[iSize], align: PositionAlign):
+        """
+        すべての画像のうち最大の幅、高さの画像にあわせて小さい画像に余白を追加する。
+
+        Args:
+            inputs (tuple[iSize] | list[iSize]): _description_
+            align (PositionAlign): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        width = max(element.width for element in inputs)
+        height = max(element.height for element in inputs)
+
+        match align:
+            case PositionAlign.TOP_LEFT:
+                height_align = JointAlign.SIDE_TOP
+                width_align = JointAlign.UNDER_LEFT
+            case PositionAlign.TOP_CENTER:
+                height_align = JointAlign.SIDE_TOP
+                width_align = JointAlign.UNDER_CENTER
+            case PositionAlign.TOP_RIGHT:
+                height_align = JointAlign.SIDE_TOP
+                width_align = JointAlign.UNDER_RIGHT
+            case PositionAlign.CENTER_LEFT:
+                height_align = JointAlign.SIDE_CENTER
+                width_align = JointAlign.UNDER_LEFT
+            case PositionAlign.CENTER_CENTER:
+                height_align = JointAlign.SIDE_CENTER
+                width_align = JointAlign.UNDER_CENTER
+            case PositionAlign.CENTER_RIGHT:
+                height_align = JointAlign.SIDE_CENTER
+                width_align = JointAlign.UNDER_RIGHT
+            case PositionAlign.BOTTOM_LEFT:
+                height_align = JointAlign.SIDE_BOTTOM
+                width_align = JointAlign.UNDER_LEFT
+            case PositionAlign.BOTTOM_CENTER:
+                height_align = JointAlign.SIDE_BOTTOM
+                width_align = JointAlign.UNDER_CENTER
+            case PositionAlign.BOTTOM_RIGHT:
+                height_align = JointAlign.SIDE_BOTTOM
+                width_align = JointAlign.UNDER_RIGHT
+
+        return tuple(
+            ImageJointer(Blank(0, height)).joint(element, height_align).joint(Blank(width, 0), width_align)
+            for element in inputs
+        )

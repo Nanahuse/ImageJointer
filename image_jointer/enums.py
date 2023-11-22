@@ -10,3 +10,15 @@ class JointAlign(Enum):
     UNDER_LEFT = auto()  # 左端ぞろえ
     UNDER_CENTER = auto()  # 中心ぞろえ
     UNDER_RIGHT = auto()  # 右端ぞろえ
+
+
+class PositionAlign(Enum):
+    TOP_LEFT = auto()
+    TOP_CENTER = auto()
+    TOP_RIGHT = auto()
+    CENTER_LEFT = auto()
+    CENTER_CENTER = auto()
+    CENTER_RIGHT = auto()
+    BOTTOM_LEFT = auto()
+    BOTTOM_CENTER = auto()
+    BOTTOM_RIGHT = auto()
