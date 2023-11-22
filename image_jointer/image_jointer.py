@@ -4,20 +4,23 @@
 # https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
 
 from __future__ import annotations
+from typing import overload
+
 from PIL import Image
 
 from .blank import Blank
 from .enums import JointAlign
+from .interfaces import iSize
 from .part import Part
 from .vector import Vector
 
 
-class ImageJointer:
-    def __init__(self, source: Image.Image | Blank | None = None) -> None:
+class ImageJointer(iSize):
+    def __init__(self, source: Image.Image | Blank | ImageJointer | None = None) -> None:
         """_summary_
 
         Args:
-            source (Image.Image | Blank | None): 画像をつなげていく元となるもの。画像なしも可
+            source (Image.Image | Blank | ImageJointer | None): 画像をつなげていく元となるもの。default to None
 
         Raises:
             ValueError: _description_
@@ -25,6 +28,10 @@ class ImageJointer:
         match source:
             case Image.Image() | Blank():
                 self.__parts: tuple[Part] = (Part(source),)
+                self.__width = source.width
+                self.__height = source.height
+            case ImageJointer():
+                self.__parts = source.__parts
                 self.__width = source.width
                 self.__height = source.height
             case None:
@@ -50,18 +57,43 @@ class ImageJointer:
     def height(self) -> int:
         return self.__height
 
-    def joint(self, image: Image.Image | Blank | ImageJointer, align: JointAlign) -> ImageJointer:
+    @overload
+    def joint(self, image: Image.Image | iSize, align: JointAlign) -> ImageJointer:
         """
-        to_image実行時まで画像は生成されない。
+        自身の右または下に別の画像を接続した新しい画像を作成する。
+        実際にはto_image実行時まで画像生成は遅延される。
 
         Args:
             image (Image.Image | iSize): 接続する画像
+
             align (JointAlign): 整列方法
 
         Returns:
             ImageJointer: メソッドチェーン可能。副作用はない。
         """
+        ...
 
+    @overload
+    def joint(
+        self,
+        images: tuple[Image.Image | iSize] | list[Image.Image | iSize],
+        align: JointAlign,
+    ) -> ImageJointer:
+        """
+        自身の右または下に別の画像を連続して接続した新しい画像を作成する。
+        実際にはto_image実行時まで画像生成は遅延される。
+
+        Args:
+            images (tuple | list): 接続する画像
+
+            align (JointAlign): 整列方法
+
+        Returns:
+            ImageJointer: メソッドチェーン可能。副作用はない。
+        """
+        ...
+
+    def joint(self, image: Image.Image | iSize | tuple | list, align: JointAlign) -> ImageJointer:
         def chain_source_move(move_to: Vector | None, paste_position: Vector):
             for tmp in self.__parts:
                 if move_to is None:
@@ -76,6 +108,15 @@ class ImageJointer:
                         yield tmp_image.move(paste_position)
                 case _:
                     ValueError("image should be PIL.Image.Image or Blank or ImageJointer")
+
+        if isinstance(image, (tuple, list)):
+            jointed = ImageJointer()
+            for element in image:
+                jointed.joint(element, align)
+            return jointed
+
+        if not isinstance(image, (Image.Image, iSize)):
+            raise ValueError("image is invalid type")
 
         match align:
             case JointAlign.SIDE_TOP:
@@ -110,9 +151,15 @@ class ImageJointer:
                     position = Vector(0, self.height)
                     return ImageJointer.__make_from_tuple(tuple(chain_source_move(move_to, position)))
             case _:
-                ValueError()
+                ValueError("align is invalid type")
 
     def to_image(self):
+        """
+        画像を生成する。
+
+        Returns:
+            Image.Image: 生成された画像
+        """
         output = Image.new("RGBA", (self.width, self.height), (0, 0, 0, 0))
         for part in self.__parts:
             part.paste_to(output)
