@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from .blank import Blank
-from .enums import JointAlign, PositionAlign
-from .interfaces import iSize
+from .base.blank import Blank
+from .base.enums import JointAlign, PositionAlign
+from .base.interfaces import iSize
 from .image_jointer import ImageJointer
 
 

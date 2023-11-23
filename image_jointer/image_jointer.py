@@ -8,11 +8,11 @@ from typing import overload
 
 from PIL import Image
 
-from .blank import Blank
-from .enums import JointAlign
-from .interfaces import iSize
-from .part import Part
-from .vector import Vector
+from .base.blank import Blank
+from .base.enums import JointAlign
+from .base.interfaces import iSize
+from .base.part import Part
+from .base.vector import Vector
 
 
 class ImageJointer(iSize):
