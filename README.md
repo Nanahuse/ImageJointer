@@ -1,4 +1,14 @@
 # ImageJointer
+
+Build up image by jointing images
+
+## install 
+```
+pip install image_jointer
+```
+
+## how to use
+
 ```python
     from image_jointer import JointAlign, ImageJointer
     from PIL import Image
