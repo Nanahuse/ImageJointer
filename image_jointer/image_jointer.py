@@ -10,12 +10,12 @@ from PIL import Image
 
 from .base.blank import Blank
 from .base.enums import JointAlign
-from .base.interfaces import iSize
-from .base.part import Part
+from .base.interfaces import _iSize
+from .base.part import _Part
 from .base.vector import Vector
 
 
-class ImageJointer(iSize):
+class ImageJointer(_iSize):
     def __init__(self, source: Image.Image | Blank | ImageJointer | None = None) -> None:
         """_summary_
 
@@ -27,7 +27,7 @@ class ImageJointer(iSize):
         """
         match source:
             case Image.Image() | Blank():
-                self.__parts: tuple[Part] = (Part(source),)
+                self.__parts: tuple[_Part] = (_Part(source),)
                 self.__width = source.width
                 self.__height = source.height
             case ImageJointer():
@@ -35,14 +35,14 @@ class ImageJointer(iSize):
                 self.__width = source.width
                 self.__height = source.height
             case None:
-                self.__parts: tuple[Part] = tuple()
+                self.__parts: tuple[_Part] = tuple()
                 self.__width = 0
                 self.__height = 0
             case _:
                 raise ValueError()
 
     @classmethod
-    def __make_from_tuple(cls, parts: tuple[Part]) -> None:
+    def __make_from_tuple(cls, parts: tuple[_Part]) -> None:
         instance = ImageJointer()
         instance.__parts = parts
         instance.__width = max(part.position.x + part.width for part in instance.__parts)
@@ -58,13 +58,13 @@ class ImageJointer(iSize):
         return self.__height
 
     @overload
-    def joint(self, image: Image.Image | iSize, align: JointAlign) -> ImageJointer:
+    def joint(self, image: Image.Image | _iSize, align: JointAlign) -> ImageJointer:
         """
         自身の右または下に別の画像を接続した新しい画像を作成する。
         実際にはto_image実行時まで画像生成は遅延される。
 
         Args:
-            image (Image.Image | iSize): 接続する画像
+            image (Image.Image | _iSize): 接続する画像
 
             align (JointAlign): 整列方法
 
@@ -76,7 +76,7 @@ class ImageJointer(iSize):
     @overload
     def joint(
         self,
-        images: tuple[Image.Image | iSize] | list[Image.Image | iSize],
+        images: tuple[Image.Image | _iSize] | list[Image.Image | _iSize],
         align: JointAlign,
     ) -> ImageJointer:
         """
@@ -93,7 +93,7 @@ class ImageJointer(iSize):
         """
         ...
 
-    def joint(self, image: Image.Image | iSize | tuple | list, align: JointAlign) -> ImageJointer:
+    def joint(self, image: Image.Image | _iSize | tuple | list, align: JointAlign) -> ImageJointer:
         def chain_source_move(move_to: Vector | None, paste_position: Vector):
             for tmp in self.__parts:
                 if move_to is None:
@@ -102,7 +102,7 @@ class ImageJointer(iSize):
                     yield tmp.move(move_to)
             match image:
                 case Image.Image() | Blank():
-                    yield Part(image, paste_position)
+                    yield _Part(image, paste_position)
                 case ImageJointer():
                     for tmp_image in image.__parts:
                         yield tmp_image.move(paste_position)
@@ -115,7 +115,7 @@ class ImageJointer(iSize):
                 jointed.joint(element, align)
             return jointed
 
-        if not isinstance(image, (Image.Image, iSize)):
+        if not isinstance(image, (Image.Image, _iSize)):
             raise ValueError("image is invalid type")
 
         match align:

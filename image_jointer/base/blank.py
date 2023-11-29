@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from .interfaces import iSize
+from .interfaces import _iSize
 
 
 @dataclass(frozen=True)
-class Blank(iSize):
+class Blank(_iSize):
     _width: int
     _height: int
 

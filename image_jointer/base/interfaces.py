@@ -1,7 +1,7 @@
 from abc import ABC, abstractproperty
 
 
-class iSize(ABC):
+class _iSize(ABC):
     @abstractproperty
     def width(self) -> int:
         pass

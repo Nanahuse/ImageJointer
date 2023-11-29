@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .base.blank import Blank
 from .base.enums import JointAlign, PositionAlign
-from .base.interfaces import iSize
+from .base.interfaces import _iSize
 from .image_jointer import ImageJointer
 
 
@@ -13,12 +13,12 @@ class Utility(object):
         raise NotImplementedError("Cannot construct")
 
     @staticmethod
-    def adjust_size(inputs: tuple[iSize] | list[iSize], align: PositionAlign):
+    def adjust_size(inputs: tuple[_iSize] | list[_iSize], align: PositionAlign):
         """
         すべての画像のうち最大の幅、高さの画像にあわせて小さい画像に余白を追加する。
 
         Args:
-            inputs (tuple[iSize] | list[iSize]): _description_
+            inputs (tuple[_iSize] | list[_iSize]): _description_
             align (PositionAlign): _description_
 
         Returns:

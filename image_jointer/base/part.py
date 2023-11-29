@@ -3,12 +3,12 @@ from dataclasses import dataclass
 from PIL import Image
 
 from .blank import Blank
-from .interfaces import iSize
+from .interfaces import _iSize
 from .vector import Vector
 
 
 @dataclass(frozen=True)
-class Part(iSize):
+class _Part(_iSize):
     source: Image.Image | Blank
     position: Vector = Vector()
 
@@ -21,7 +21,7 @@ class Part(iSize):
         return self.source.height
 
     def move(self, vector: Vector):
-        return Part(self.source, self.position + vector)
+        return _Part(self.source, self.position + vector)
 
     def paste_to(self, output: Image.Image):
         match self.source:
