@@ -7,7 +7,7 @@ from pathlib import Path
 IMAGE_FOLDER = Path("./test/image/")
 
 
-def test_adjust_size():
+def test_unify_image_size():
     from image_jointer import Blank, ImageJointer, JointAlign, PositionAlign, Utility
     from PIL import Image
 
@@ -19,7 +19,7 @@ def test_adjust_size():
     )
 
     for align in PositionAlign:
-        result_tuple = Utility.adjust_size(image_tuple, align)
+        result_tuple = Utility.unify_image_size(image_tuple, align)
 
         assert len(image_tuple) == len(result_tuple)
 
@@ -30,4 +30,4 @@ def test_adjust_size():
             jointed = jointed.joint(result, JointAlign.SIDE_CENTER)
 
         joint_img = jointed.to_image()
-        joint_img.save(IMAGE_FOLDER / "adjust_size" / f"{align.name}.png")
+        joint_img.save(IMAGE_FOLDER / "unify_image_size" / f"{align.name}.png")

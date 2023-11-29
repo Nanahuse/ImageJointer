@@ -13,9 +13,9 @@ class Utility(object):
         raise NotImplementedError("Cannot construct")
 
     @staticmethod
-    def adjust_size(inputs: tuple[_iSize] | list[_iSize], align: PositionAlign):
+    def unify_image_size(inputs: tuple[_iSize] | list[_iSize], align: PositionAlign):
         """
-        Adjust image size to maximum width and heigh.
+        All image will be unified to maximum width and heigh.
         Add transparent padding if image width (height) is smaller then maximum width (height).
 
         Args:
