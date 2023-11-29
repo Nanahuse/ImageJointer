@@ -15,14 +15,15 @@ class Utility(object):
     @staticmethod
     def adjust_size(inputs: tuple[_iSize] | list[_iSize], align: PositionAlign):
         """
-        すべての画像のうち最大の幅、高さの画像にあわせて小さい画像に余白を追加する。
+        Adjust image size to maximum width and heigh.
+        Add transparent padding if image width (height) is smaller then maximum width (height).
 
         Args:
-            inputs (tuple[_iSize] | list[_iSize]): _description_
-            align (PositionAlign): _description_
+            inputs (tuple[_iSize] | list[_iSize]): images
+            align (PositionAlign): how to add transparent padding
 
         Returns:
-            _type_: _description_
+            tuple[ImageJointer]: tuple of adjusted image
         """
         width = max(element.width for element in inputs)
         height = max(element.height for element in inputs)

@@ -17,13 +17,16 @@ from .base.vector import Vector
 
 class ImageJointer(_iSize):
     def __init__(self, source: Image.Image | Blank | ImageJointer | None = None) -> None:
-        """_summary_
+        """
+        Building up image by jointing images.
+        Building image will be postponed until execute to_image.
+        Method chainable.
 
         Args:
-            source (Image.Image | Blank | ImageJointer | None): 画像をつなげていく元となるもの。default to None
+            source (Image.Image | Blank | ImageJointer | None): source of building up. default to None
 
         Raises:
-            ValueError: _description_
+            ValueError: raise if source is invalid type
         """
         match source:
             case Image.Image() | Blank():
@@ -39,7 +42,7 @@ class ImageJointer(_iSize):
                 self.__width = 0
                 self.__height = 0
             case _:
-                raise ValueError()
+                raise ValueError("unexpected type source")
 
     @classmethod
     def __make_from_tuple(cls, parts: tuple[_Part]) -> None:
@@ -60,16 +63,16 @@ class ImageJointer(_iSize):
     @overload
     def joint(self, image: Image.Image | _iSize, align: JointAlign) -> ImageJointer:
         """
-        自身の右または下に別の画像を接続した新しい画像を作成する。
-        実際にはto_image実行時まで画像生成は遅延される。
+        Joint new image to right side or bottom.
+        There are no side effect.
 
         Args:
-            image (Image.Image | _iSize): 接続する画像
+            image (Image.Image | _iSize): jointed image
 
-            align (JointAlign): 整列方法
+            align (JointAlign): connect position
 
         Returns:
-            ImageJointer: メソッドチェーン可能。副作用はない。
+            ImageJointer: New instance of jointed image. Method chainable.
         """
         ...
 
@@ -80,16 +83,16 @@ class ImageJointer(_iSize):
         align: JointAlign,
     ) -> ImageJointer:
         """
-        自身の右または下に別の画像を連続して接続した新しい画像を作成する。
-        実際にはto_image実行時まで画像生成は遅延される。
+        Joint new images to right side or bottom repeatedly.
+        There are no side effect.
 
         Args:
-            images (tuple | list): 接続する画像
+            image (Image.Image | _iSize): jointed image
 
-            align (JointAlign): 整列方法
+            align (JointAlign): connect position
 
         Returns:
-            ImageJointer: メソッドチェーン可能。副作用はない。
+            ImageJointer: New instance of jointed image. Method chainable.
         """
         ...
 
@@ -107,7 +110,7 @@ class ImageJointer(_iSize):
                     for tmp_image in image.__parts:
                         yield tmp_image.move(paste_position)
                 case _:
-                    ValueError("image should be PIL.Image.Image or Blank or ImageJointer")
+                    ValueError("Image should be PIL.Image.Image or Blank or ImageJointer")
 
         if isinstance(image, (tuple, list)):
             jointed = ImageJointer()
@@ -116,7 +119,7 @@ class ImageJointer(_iSize):
             return jointed
 
         if not isinstance(image, (Image.Image, _iSize)):
-            raise ValueError("image is invalid type")
+            raise ValueError("Image is invalid type")
 
         match align:
             case JointAlign.SIDE_TOP:
@@ -155,10 +158,10 @@ class ImageJointer(_iSize):
 
     def to_image(self):
         """
-        画像を生成する。
+        Make Image.
 
         Returns:
-            Image.Image: 生成された画像
+            Image.Image: image
         """
         output = Image.new("RGBA", (self.width, self.height), (0, 0, 0, 0))
         for part in self.__parts:
