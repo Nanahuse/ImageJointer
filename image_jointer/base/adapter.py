@@ -7,6 +7,7 @@ from .figure import Figure
 from .part import _Part
 from .vector import Vector
 
+
 @dataclass(frozen=True)
 class ImageAdapter(Figure):
     image: Image.Image

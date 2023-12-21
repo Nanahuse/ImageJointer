@@ -58,8 +58,6 @@ class Utility(object):
                 width_align = JointAlign.UNDER_RIGHT
 
         return tuple(
-            ImageJointer(Blank(0, height))
-            .joint(height_align, element)
-            .joint(width_align, Blank(width, 0))
+            ImageJointer(Blank(0, height)).joint(height_align, element).joint(width_align, Blank(width, 0))
             for element in inputs
         )

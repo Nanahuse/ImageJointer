@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 from abc import ABC, abstractproperty, abstractmethod
-from typing import Generator
+from typing import TYPE_CHECKING, Generator
 
 from PIL import Image
 
 from .vector import Vector
+
+if TYPE_CHECKING:
+    from .part import _Part
+
 
 class Figure(ABC):
     @abstractproperty
@@ -15,7 +21,7 @@ class Figure(ABC):
         ...
 
     @abstractmethod
-    def paste(self, pos: Vector):
+    def paste(self, pos: Vector) -> Generator[_Part, None, None]:
         ...
 
     @abstractmethod

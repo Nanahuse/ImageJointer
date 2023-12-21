@@ -6,6 +6,7 @@ from .part import _Part
 from .figure import Figure
 from .vector import Vector
 
+
 @dataclass(frozen=True)
 class Blank(Figure):
     _width: int

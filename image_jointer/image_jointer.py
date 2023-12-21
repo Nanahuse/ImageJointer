@@ -4,11 +4,10 @@
 # https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
 
 from __future__ import annotations
-from typing import overload
+from typing import assert_never
 
 from PIL import Image
 
-from .base.blank import Blank
 from .base.enums import JointAlign
 from .base.figure import Figure
 from .base.adapter import ImageAdapter
@@ -50,7 +49,7 @@ class ImageJointer(Figure):
                 self.__height = source.height
 
     @classmethod
-    def __make_from_tuple(cls, parts: tuple[_Part,...]) -> ImageJointer:
+    def __make_from_tuple(cls, parts: tuple[_Part, ...]) -> ImageJointer:
         instance = ImageJointer()
         instance.__parts = parts
         instance.__width = max(part.position.x + part.width for part in instance.__parts)
@@ -73,6 +72,56 @@ class ImageJointer(Figure):
         for part in self.__parts:
             part.draw(output)
 
+    def __calc_shift(self, apos: Vector) -> Vector:
+        """
+        Calculate shift position for primary part from absolute paste position.
+        To image centering, if secondary part is larger than primary part,
+        we need to move primary part from original position to acquire gap.
+        In such situation, this function returns desired position shift length.
+        """
+        return Vector(-min(0, apos.x), -min(0, apos.y))
+
+    def __calc_paste(self, apos: Vector):
+        """
+        Calculate paste position for secondary part from absolute paste position.
+        To image centering, if primary part is larger than secondary part,
+        we need to take gap from original position.
+        In such situation, this function returns desired paste position.
+        """
+        return Vector(+max(0, apos.x), +max(0, apos.y))
+
+    def __calc_absolute_paste_pos(self, align: JointAlign, image: Figure) -> Vector:
+        """
+        Calculate absolute paste position from desired alignment.
+        Despite of real image area,
+        We assume infinite =(-inf, +inf) area for images in this function.
+        We call this imaginary position as absolute paste position.
+        But this assume is not real condition
+        so we need to calculate real relative moves
+        from this positions for primary/secondary parts.
+        Such convresion is implemented as calc_shift() and calc_paste().
+        """
+        match align:
+            case JointAlign.SIDE_TOP:
+                return Vector(self.width, 0)
+            case JointAlign.SIDE_CENTER:
+                return Vector(self.width, (self.height - image.height) // 2)
+            case JointAlign.SIDE_BOTTOM:
+                return Vector(self.width, self.height - image.height)
+            case JointAlign.UNDER_LEFT:
+                return Vector(0, self.height)
+            case JointAlign.UNDER_CENTER:
+                return Vector((self.width - image.width) // 2, self.height)
+            case JointAlign.UNDER_RIGHT:
+                return Vector(self.width - image.width, self.height)
+            case _ as unreachable:
+                assert_never(unreachable)
+
+    def __run_joint(self, image: Figure, move_to: Vector, paste_to: Vector):
+        for tmp in self.__parts:
+            yield tmp.move(move_to)
+        yield from image.paste(paste_to)
+
     def joint_single(self, align: JointAlign, image: Image.Image | Figure) -> ImageJointer:
         """
         Joint new image to right side or bottom.
@@ -88,50 +137,18 @@ class ImageJointer(Figure):
         """
         if not isinstance(image, (Image.Image, Figure)):
             raise ValueError("Image is invalid type")
+        if not isinstance(align, JointAlign):
+            raise ValueError("align is invalid type")
 
         match image:
             case Image.Image():
                 image = ImageAdapter(image)
 
-        def chain_source_move(move_to: Vector, paste_position: Vector):
-            for tmp in self.__parts:
-                yield tmp.move(move_to)
-            yield from image.paste(paste_position)
-
-        match align:
-            case JointAlign.SIDE_TOP:
-                position = Vector(self.width, 0)
-                return ImageJointer.__make_from_tuple(tuple(chain_source_move(Vector(0, 0), position)))
-            case JointAlign.SIDE_CENTER | JointAlign.SIDE_BOTTOM:
-                if align is JointAlign.SIDE_CENTER:
-                    height = (self.height - image.height) // 2
-                else:
-                    height = self.height - image.height
-                if height >= 0:
-                    position = Vector(self.width, height)
-                    return ImageJointer.__make_from_tuple(tuple(chain_source_move(Vector(0, 0), position)))
-                else:
-                    move_to = Vector(0, -height)
-                    position = Vector(self.width, 0)
-                    return ImageJointer.__make_from_tuple(tuple(chain_source_move(move_to, position)))
-
-            case JointAlign.UNDER_LEFT:
-                position = Vector(0, self.height)
-                return ImageJointer.__make_from_tuple(tuple(chain_source_move(Vector(0, 0), position)))
-            case JointAlign.UNDER_CENTER | JointAlign.UNDER_RIGHT:
-                if align is JointAlign.UNDER_CENTER:
-                    width = (self.width - image.width) // 2
-                else:
-                    width = self.width - image.width
-                if width >= 0:
-                    position = Vector(width, self.height)
-                    return ImageJointer.__make_from_tuple(tuple(chain_source_move(Vector(0, 0), position)))
-                else:
-                    move_to = Vector(-width, 0)
-                    position = Vector(0, self.height)
-                    return ImageJointer.__make_from_tuple(tuple(chain_source_move(move_to, position)))
-            case _:
-                ValueError("align is invalid type")
+        offset = self.__calc_absolute_paste_pos(align, image)
+        shift_to = self.__calc_shift(offset)
+        paste_to = self.__calc_paste(offset)
+        parts = tuple(self.__run_joint(image, shift_to, paste_to))
+        return ImageJointer.__make_from_tuple(parts)
 
     def joint(
         self,
