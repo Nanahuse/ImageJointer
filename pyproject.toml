@@ -22,3 +22,6 @@ dev = [
     "mypy",
     "types-pillow",
 ]
+
+[tool.black]
+line-length = 120
