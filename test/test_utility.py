@@ -19,7 +19,7 @@ def test_unify_image_size():
     )
 
     for align in PositionAlign:
-        result_tuple = Utility.unify_image_size(image_tuple, align)
+        result_tuple = Utility.unify_image_size(align, *image_tuple)
 
         assert len(image_tuple) == len(result_tuple)
 
@@ -27,7 +27,7 @@ def test_unify_image_size():
         for result in result_tuple:
             assert result.width == 100
             assert result.height == 100
-            jointed = jointed.joint(result, JointAlign.SIDE_CENTER)
+            jointed = jointed.joint(JointAlign.SIDE_CENTER, result)
 
         joint_img = jointed.to_image()
         joint_img.save(IMAGE_FOLDER / "unify_image_size" / f"{align.name}.png")

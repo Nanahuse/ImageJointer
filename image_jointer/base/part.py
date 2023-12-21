@@ -2,14 +2,13 @@ from dataclasses import dataclass
 
 from PIL import Image
 
-from .blank import Blank
-from .interfaces import _iSize
+from .figure import Figure
 from .vector import Vector
 
 
 @dataclass(frozen=True)
-class _Part(_iSize):
-    source: Image.Image | Blank
+class _Part:
+    source: Figure
     position: Vector = Vector()
 
     @property
@@ -20,14 +19,8 @@ class _Part(_iSize):
     def height(self) -> int:
         return self.source.height
 
-    def move(self, vector: Vector):
-        return _Part(self.source, self.position + vector)
+    def move(self, shift_to: Vector):
+        return _Part(self.source, self.position + shift_to)
 
-    def paste_to(self, output: Image.Image):
-        match self.source:
-            case Image.Image():
-                output.paste(self.source, (self.position.x, self.position.y))
-            case Blank():
-                pass
-            case _:
-                raise RuntimeError()
+    def draw(self, output: Image.Image):
+        self.source.draw(output, self.position)

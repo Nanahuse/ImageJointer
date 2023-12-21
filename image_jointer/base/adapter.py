@@ -1,26 +1,26 @@
 from dataclasses import dataclass
+from typing import Generator
 
 from PIL import Image
 
-from .part import _Part
 from .figure import Figure
+from .part import _Part
 from .vector import Vector
 
 @dataclass(frozen=True)
-class Blank(Figure):
-    _width: int
-    _height: int
+class ImageAdapter(Figure):
+    image: Image.Image
 
     @property
     def width(self) -> int:
-        return self._width
+        return self.image.width
 
     @property
     def height(self) -> int:
-        return self._height
+        return self.image.height
 
-    def paste(self, pos: Vector):
+    def paste(self, pos: Vector) -> Generator[_Part, None, None]:
         yield _Part(self, pos)
 
     def draw(self, output: Image.Image, pos: Vector):
-        pass
+        output.paste(self.image, (pos.x, pos.y))

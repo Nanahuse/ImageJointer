@@ -21,7 +21,7 @@ def test_joint_side_top():
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     blue = Image.new("RGBA", (100, 200), (0, 0, 255))
 
-    jointed = ImageJointer(red).joint(blue, JointAlign.SIDE_TOP)
+    jointed = ImageJointer(red).joint(JointAlign.SIDE_TOP, blue)
     joint_img = jointed.to_image()
     joint_img.save(IMAGE_FOLDER / "joint" / "SIDE_TOP.png")
 
@@ -42,7 +42,7 @@ def test_joint_side_center():
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     blue = Image.new("RGBA", (100, 200), (0, 0, 255))
 
-    jointed = ImageJointer(red).joint(blue, JointAlign.SIDE_CENTER)
+    jointed = ImageJointer(red).joint(JointAlign.SIDE_CENTER, blue)
     joint_img = jointed.to_image()
     joint_img.save(IMAGE_FOLDER / "joint" / "SIDE_CENTER.png")
 
@@ -63,7 +63,7 @@ def test_joint_side_bottom():
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     blue = Image.new("RGBA", (100, 200), (0, 0, 255))
 
-    jointed = ImageJointer(red).joint(blue, JointAlign.SIDE_BOTTOM)
+    jointed = ImageJointer(red).joint(JointAlign.SIDE_BOTTOM, blue)
     joint_img = jointed.to_image()
     joint_img.save(IMAGE_FOLDER / "joint" / "SIDE_BOTTOM.png")
 
@@ -84,7 +84,7 @@ def test_joint_down_left():
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     blue = Image.new("RGBA", (200, 100), (0, 0, 255))
 
-    jointed = ImageJointer(red).joint(blue, JointAlign.UNDER_LEFT)
+    jointed = ImageJointer(red).joint(JointAlign.UNDER_LEFT, blue)
     joint_img = jointed.to_image()
     joint_img.save(IMAGE_FOLDER / "joint" / "DOWN_LEFT.png")
 
@@ -105,7 +105,7 @@ def test_joint_down_center():
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     blue = Image.new("RGBA", (200, 100), (0, 0, 255))
 
-    jointed = ImageJointer(red).joint(blue, JointAlign.UNDER_CENTER)
+    jointed = ImageJointer(red).joint(JointAlign.UNDER_CENTER, blue)
     joint_img = jointed.to_image()
     joint_img.save(IMAGE_FOLDER / "joint" / "DOWN_CENTER.png")
 
@@ -126,7 +126,7 @@ def test_joint_down_right():
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     blue = Image.new("RGBA", (200, 100), (0, 0, 255))
 
-    jointed = ImageJointer(red).joint(blue, JointAlign.UNDER_RIGHT)
+    jointed = ImageJointer(red).joint(JointAlign.UNDER_RIGHT, blue)
     joint_img = jointed.to_image()
     joint_img.save(IMAGE_FOLDER / "joint" / "DOWN_RIGHT.png")
 
@@ -150,16 +150,16 @@ def test_joint_nest():
 
     nest0 = (
         ImageJointer(red)
-        .joint(green, JointAlign.SIDE_CENTER)
-        .joint(ImageJointer(blue).joint(blue, JointAlign.SIDE_CENTER), JointAlign.UNDER_LEFT)
+        .joint(JointAlign.SIDE_CENTER, green)
+        .joint(JointAlign.UNDER_LEFT, ImageJointer(blue).joint(JointAlign.SIDE_CENTER, blue))
     )
     nest0_image = nest0.to_image()
     nest0_image.save(IMAGE_FOLDER / "joint" / "nest.png")
 
     nest1 = (
         ImageJointer()
-        .joint(ImageJointer(red).joint(blue, JointAlign.UNDER_CENTER), JointAlign.SIDE_CENTER)
-        .joint(ImageJointer(green).joint(blue, JointAlign.UNDER_CENTER), JointAlign.SIDE_CENTER)
+        .joint(JointAlign.SIDE_CENTER, ImageJointer(red).joint(JointAlign.UNDER_CENTER, blue))
+        .joint(JointAlign.SIDE_CENTER, ImageJointer(green).joint(JointAlign.UNDER_CENTER, blue))
     )
     nest1_image = nest1.to_image()
 
@@ -175,7 +175,7 @@ def test_blank():
     blank = Blank(50, 100)
     green = Image.new("RGB", (100, 100), (0, 255, 0))
 
-    jointed = ImageJointer(red).joint(blank, JointAlign.SIDE_CENTER).joint(green, JointAlign.SIDE_CENTER)
+    jointed = ImageJointer(red).joint(JointAlign.SIDE_CENTER, blank).joint(JointAlign.SIDE_CENTER, green)
     joint_img = jointed.to_image()
     joint_img.save(IMAGE_FOLDER / "blank" / "Blank.png")
 
