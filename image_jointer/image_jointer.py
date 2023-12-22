@@ -7,7 +7,7 @@ from typing import assert_never
 
 from PIL import Image
 
-from .base.enums import JointAlign
+from .base.enums import JointAlignment
 from .base.figure import Figure
 from .base.adapter import ImageAdapter
 from .base.part import _Part
@@ -89,7 +89,7 @@ class ImageJointer(Figure):
         """
         return Vector(+max(0, diff.x), +max(0, diff.y))
 
-    def __calc_absolute_paste_pos(self, align: JointAlign, image: Figure) -> Vector:
+    def __calc_absolute_paste_pos(self, align: JointAlignment, image: Figure) -> Vector:
         """
         Calculate absolute paste position from desired alignment.
         Despite of real image area,
@@ -101,17 +101,17 @@ class ImageJointer(Figure):
         Such conversion is implemented as calc_shift() and calc_paste().
         """
         match align:
-            case JointAlign.SIDE_TOP:
+            case JointAlignment.RIGHT_TOP:
                 return Vector(self.width, 0)
-            case JointAlign.SIDE_CENTER:
+            case JointAlignment.RIGHT_CENTER:
                 return Vector(self.width, (self.height - image.height) // 2)
-            case JointAlign.SIDE_BOTTOM:
+            case JointAlignment.RIGHT_BOTTOM:
                 return Vector(self.width, self.height - image.height)
-            case JointAlign.UNDER_LEFT:
+            case JointAlignment.DOWN_LEFT:
                 return Vector(0, self.height)
-            case JointAlign.UNDER_CENTER:
+            case JointAlignment.DOWN_CENTER:
                 return Vector((self.width - image.width) // 2, self.height)
-            case JointAlign.UNDER_RIGHT:
+            case JointAlignment.DOWN_RIGHT:
                 return Vector(self.width - image.width, self.height)
             case _ as unreachable:
                 assert_never(unreachable)
@@ -121,13 +121,13 @@ class ImageJointer(Figure):
             yield tmp.shift(shift_to)
         yield from image._paste(paste_to)
 
-    def joint_single(self, align: JointAlign, image: Image.Image | Figure) -> ImageJointer:
+    def joint_single(self, align: JointAlignment, image: Image.Image | Figure) -> ImageJointer:
         """
         Joint new image to right side or bottom.
         There are no side effect.
 
         Args:
-            align (JointAlign): how to align image
+            align (JointAlignment): how to align image
 
             image (Image.Image | Figure): image to joint
 
@@ -136,7 +136,7 @@ class ImageJointer(Figure):
         """
         if not isinstance(image, (Image.Image, Figure)):
             raise ValueError("Image is invalid type")
-        if not isinstance(align, JointAlign):
+        if not isinstance(align, JointAlignment):
             raise ValueError("align is invalid type")
 
         match image:
@@ -151,7 +151,7 @@ class ImageJointer(Figure):
 
     def joint(
         self,
-        align: JointAlign,
+        align: JointAlignment,
         *images: Image.Image | Figure,
     ) -> ImageJointer:
         """
@@ -159,7 +159,7 @@ class ImageJointer(Figure):
         There are no side effect.
 
         Args:
-            align (JointAlign): how to align image
+            align (JointAlignment): how to align image
 
             *images (Image.Image | Figure): images to joint
 

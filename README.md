@@ -19,10 +19,10 @@ pip install image_jointer
 
     jointed = (
         ImageJointer(red)
-        .joint(green, JointAlign.SIDE_CENTER)
+        .joint(green, JointAlign.RIGHT_CENTER)
         .joint(
-            ImageJointer(blue).joint(blue, JointAlign.SIDE_CENTER),
-            JointAlign.UNDER_LEFT
+            ImageJointer(blue).joint(blue, JointAlign.RIGHT_CENTER),
+            JointAlign.DOWN_LEFT
         )
     )
     joint_img = jointed.to_image()
@@ -39,8 +39,8 @@ pip install image_jointer
 
     jointed = (
         ImageJointer(red)
-        .joint(blank, JointAlign.SIDE_CENTER)
-        .joint(green, JointAlign.SIDE_CENTER)
+        .joint(blank, JointAlign.RIGHT_CENTER)
+        .joint(green, JointAlign.RIGHT_CENTER)
     )
     joint_img = jointed.to_image()
 ```
@@ -53,7 +53,7 @@ pip install image_jointer
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     blue = Image.new("RGBA", (100, 200), (0, 0, 255))
 
-    jointed = ImageJointer(red).joint(blue, JointAlign.SIDE_CENTER)
+    jointed = ImageJointer(red).joint(blue, JointAlign.RIGHT_CENTER)
     joint_img = jointed.to_image()
 ```
 ![side_center](./doc/joint_side_center.png)
