@@ -2,13 +2,22 @@
 # This software is released under the MIT License
 # https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
 
+import pytest
 from pathlib import Path
+
+from assert_image import assert_image
+
+from image_jointer import PositionAlign
 
 IMAGE_FOLDER = Path("./test/image/")
 
 
-def test_unify_image_size():
-    from image_jointer import Blank, ImageJointer, JointAlign, PositionAlign, Utility
+@pytest.mark.parametrize(
+    "alignment",
+    (alignment for alignment in PositionAlign),
+)
+def test_unify_image_size(alignment: PositionAlign):
+    from image_jointer import Blank, ImageJointer, JointAlign, Utility
     from PIL import Image
 
     image_tuple = (
@@ -18,16 +27,19 @@ def test_unify_image_size():
         Blank(30, 30),
     )
 
-    for align in PositionAlign:
-        result_tuple = Utility.unify_image_size(align, *image_tuple)
+    result_tuple = Utility.unify_image_size(alignment, *image_tuple)
 
-        assert len(image_tuple) == len(result_tuple)
+    assert len(image_tuple) == len(result_tuple)
 
-        jointed = ImageJointer()
-        for result in result_tuple:
-            assert result.width == 100
-            assert result.height == 100
-            jointed = jointed.joint(JointAlign.SIDE_CENTER, result)
+    jointed = ImageJointer()
+    for result in result_tuple:
+        assert result.width == 100
+        assert result.height == 100
+        jointed = jointed.joint(JointAlign.SIDE_CENTER, result)
 
-        joint_img = jointed.to_image()
-        joint_img.save(IMAGE_FOLDER / "unify_image_size" / f"{align.name}.png")
+    joint_img = jointed.to_image()
+    joint_img.save(IMAGE_FOLDER / "unify_image_size" / f"{alignment.name}_test.png")
+
+    expected_image = Image.open(IMAGE_FOLDER / "unify_image_size" / f"{alignment.name}_expected.png")
+
+    assert_image(joint_img, expected_image)
