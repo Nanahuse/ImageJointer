@@ -166,6 +166,25 @@ def test_joint_nest():
     assert np.array_equal(np.asarray(nest0_image), np.asarray(nest1_image))
 
 
+def test_joint_multiple_input():
+    from image_jointer import JointAlign, ImageJointer
+    from PIL import Image
+    import numpy as np
+
+    red = Image.new("RGBA", (100, 100), (255, 0, 0))
+    green = Image.new("RGBA", (100, 100), (0, 255, 0))
+    blue = Image.new("RGBA", (100, 100), (0, 0, 255))
+
+    multiple0 = ImageJointer().joint(JointAlign.SIDE_CENTER, red, green, blue)
+    multiple0_image = multiple0.to_image()
+    multiple0_image.save(IMAGE_FOLDER / "joint" / "multiple_input.png")
+
+    multiple1 = ImageJointer().joint(JointAlign.SIDE_CENTER, *(red, green, blue))
+    multiple1_image = multiple1.to_image()
+
+    assert np.array_equal(np.asarray(multiple0_image), np.asarray(multiple1_image))
+
+
 def test_blank():
     from image_jointer import JointAlign, ImageJointer, Blank
     from PIL import Image
@@ -175,7 +194,7 @@ def test_blank():
     blank = Blank(50, 100)
     green = Image.new("RGB", (100, 100), (0, 255, 0))
 
-    jointed = ImageJointer(red).joint(JointAlign.SIDE_CENTER, blank).joint(JointAlign.SIDE_CENTER, green)
+    jointed = ImageJointer().joint(JointAlign.SIDE_CENTER, red, blank, green)
     joint_img = jointed.to_image()
     joint_img.save(IMAGE_FOLDER / "blank" / "Blank.png")
 
