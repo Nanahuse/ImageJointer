@@ -1,7 +1,6 @@
 # Copyright (c) 2023 Nanahuse
 # This software is released under the MIT License
 # https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
-# https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
 
 from __future__ import annotations
 from typing import assert_never
@@ -25,7 +24,7 @@ class ImageJointer(Figure):
         Method chainable.
 
         Args:
-            source (Image.Image | Blank | ImageJointer | None): source of building up. default to None
+            source (Image.Image | Figure | None): source of building up. default to None
 
         Raises:
             ValueError: raise if source is invalid type
@@ -99,7 +98,7 @@ class ImageJointer(Figure):
         But this assume is not real condition
         so we need to calculate real relative moves
         from this positions for primary/secondary parts.
-        Such convresion is implemented as calc_shift() and calc_paste().
+        Such conversion is implemented as calc_shift() and calc_paste().
         """
         match align:
             case JointAlign.SIDE_TOP:
@@ -128,9 +127,9 @@ class ImageJointer(Figure):
         There are no side effect.
 
         Args:
-            image (Image.Image | _iSize): jointed image
+            align (JointAlign): how to align image
 
-            align (JointAlign): connect position
+            image (Image.Image | Figure): image to joint
 
         Returns:
             ImageJointer: New instance of jointed image. Method chainable.
@@ -160,9 +159,9 @@ class ImageJointer(Figure):
         There are no side effect.
 
         Args:
-            image (Image.Image | _iSize): jointed image
+            align (JointAlign): how to align image
 
-            align (JointAlign): connect position
+            *images (Image.Image | Figure): images to joint
 
         Returns:
             ImageJointer: New instance of jointed image. Method chainable.

@@ -19,8 +19,8 @@ class Utility(object):
         Add transparent padding if image width (height) is smaller then maximum width (height).
 
         Args:
-            inputs (tuple[_iSize] | list[_iSize]): images
             align (PositionAlign): how to add transparent padding
+            *images (Image.Image | Figure): images to joint
 
         Returns:
             tuple[ImageJointer]: tuple of adjusted image
