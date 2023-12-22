@@ -15,12 +15,11 @@ Homepage = "https://github.com/Nanahuse/ImageJointer"
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "numpy",
     "flake8",
     "black",
     "isort",
     "mypy",
-    "types-pillow",
+    "types-pillow"
 ]
 
 [tool.black]

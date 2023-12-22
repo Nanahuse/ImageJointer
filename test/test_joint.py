@@ -2,7 +2,13 @@
 # This software is released under the MIT License
 # https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
 
+import pytest
 from pathlib import Path
+
+from assert_image import assert_image
+
+from image_jointer import JointAlign
+
 
 IMAGE_FOLDER = Path("./test/image/")
 
@@ -13,136 +19,32 @@ def test_vector():
     assert Vector(5, 5) + Vector(6, 6) == Vector(11, 11)
 
 
-def test_joint_side_top():
-    from image_jointer import JointAlign, ImageJointer
+@pytest.mark.parametrize(
+    "alignment",
+    (alignment for alignment in JointAlign),
+)
+def test_joint_alignment(alignment: JointAlign):
+    from image_jointer import ImageJointer
     from PIL import Image
-    import numpy as np
 
-    red = Image.new("RGBA", (100, 100), (255, 0, 0))
-    blue = Image.new("RGBA", (100, 200), (0, 0, 255))
+    test_name = alignment.name
 
-    jointed = ImageJointer(red).joint(JointAlign.SIDE_TOP, blue)
+    red = Image.new("RGBA", (50, 50), (255, 0, 0))
+    green = Image.new("RGBA", (100, 100), (0, 255, 0))
+    blue = Image.new("RGBA", (50, 50), (0, 0, 255))
+
+    jointed = ImageJointer(red).joint(alignment, green).joint(alignment, blue)
     joint_img = jointed.to_image()
-    joint_img.save(IMAGE_FOLDER / "joint" / "SIDE_TOP.png")
+    joint_img.save(IMAGE_FOLDER / "joint" / f"{test_name}_test.png")
 
-    correct_array = np.zeros((200, 200, 4), dtype=np.uint8)
-    correct_array[0:100, 0:100, 0] = 255
-    correct_array[0:100, 0:100, 3] = 255
-    correct_array[0:200, 100:200, 2] = 255
-    correct_array[0:200, 100:200, 3] = 255
+    expected_image = Image.open(IMAGE_FOLDER / "joint" / f"{test_name}_expected.png")
 
-    assert np.array_equal(np.asarray(joint_img), correct_array)
-
-
-def test_joint_side_center():
-    from image_jointer import JointAlign, ImageJointer
-    from PIL import Image
-    import numpy as np
-
-    red = Image.new("RGBA", (100, 100), (255, 0, 0))
-    blue = Image.new("RGBA", (100, 200), (0, 0, 255))
-
-    jointed = ImageJointer(red).joint(JointAlign.SIDE_CENTER, blue)
-    joint_img = jointed.to_image()
-    joint_img.save(IMAGE_FOLDER / "joint" / "SIDE_CENTER.png")
-
-    correct_array = np.zeros((200, 200, 4), dtype=np.uint8)
-    correct_array[50:150, 0:100, 0] = 255
-    correct_array[50:150, 0:100, 3] = 255
-    correct_array[0:200, 100:200, 2] = 255
-    correct_array[0:200, 100:200, 3] = 255
-
-    assert np.array_equal(np.asarray(joint_img), correct_array)
-
-
-def test_joint_side_bottom():
-    from image_jointer import JointAlign, ImageJointer
-    from PIL import Image
-    import numpy as np
-
-    red = Image.new("RGBA", (100, 100), (255, 0, 0))
-    blue = Image.new("RGBA", (100, 200), (0, 0, 255))
-
-    jointed = ImageJointer(red).joint(JointAlign.SIDE_BOTTOM, blue)
-    joint_img = jointed.to_image()
-    joint_img.save(IMAGE_FOLDER / "joint" / "SIDE_BOTTOM.png")
-
-    correct_array = np.zeros((200, 200, 4), dtype=np.uint8)
-    correct_array[100:200, 0:100, 0] = 255
-    correct_array[100:200, 0:100, 3] = 255
-    correct_array[0:200, 100:200, 2] = 255
-    correct_array[0:200, 100:200, 3] = 255
-
-    assert np.array_equal(np.asarray(joint_img), correct_array)
-
-
-def test_joint_down_left():
-    from image_jointer import JointAlign, ImageJointer
-    from PIL import Image
-    import numpy as np
-
-    red = Image.new("RGBA", (100, 100), (255, 0, 0))
-    blue = Image.new("RGBA", (200, 100), (0, 0, 255))
-
-    jointed = ImageJointer(red).joint(JointAlign.UNDER_LEFT, blue)
-    joint_img = jointed.to_image()
-    joint_img.save(IMAGE_FOLDER / "joint" / "DOWN_LEFT.png")
-
-    correct_array = np.zeros((200, 200, 4), dtype=np.uint8)
-    correct_array[0:100, 0:100, 0] = 255
-    correct_array[0:100, 0:100, 3] = 255
-    correct_array[100:200, 0:200, 2] = 255
-    correct_array[100:200, 0:200, 3] = 255
-
-    assert np.array_equal(np.asarray(joint_img), correct_array)
-
-
-def test_joint_down_center():
-    from image_jointer import JointAlign, ImageJointer
-    from PIL import Image
-    import numpy as np
-
-    red = Image.new("RGBA", (100, 100), (255, 0, 0))
-    blue = Image.new("RGBA", (200, 100), (0, 0, 255))
-
-    jointed = ImageJointer(red).joint(JointAlign.UNDER_CENTER, blue)
-    joint_img = jointed.to_image()
-    joint_img.save(IMAGE_FOLDER / "joint" / "DOWN_CENTER.png")
-
-    correct_array = np.zeros((200, 200, 4), dtype=np.uint8)
-    correct_array[0:100, 50:150, 0] = 255
-    correct_array[0:100, 50:150, 3] = 255
-    correct_array[100:200, 0:200, 2] = 255
-    correct_array[100:200, 0:200, 3] = 255
-
-    assert np.array_equal(np.asarray(joint_img), correct_array)
-
-
-def test_joint_down_right():
-    from image_jointer import JointAlign, ImageJointer
-    from PIL import Image
-    import numpy as np
-
-    red = Image.new("RGBA", (100, 100), (255, 0, 0))
-    blue = Image.new("RGBA", (200, 100), (0, 0, 255))
-
-    jointed = ImageJointer(red).joint(JointAlign.UNDER_RIGHT, blue)
-    joint_img = jointed.to_image()
-    joint_img.save(IMAGE_FOLDER / "joint" / "DOWN_RIGHT.png")
-
-    correct_array = np.zeros((200, 200, 4), dtype=np.uint8)
-    correct_array[0:100, 100:200, 0] = 255
-    correct_array[0:100, 100:200, 3] = 255
-    correct_array[100:200, 0:200, 2] = 255
-    correct_array[100:200, 0:200, 3] = 255
-
-    assert np.array_equal(np.asarray(joint_img), correct_array)
+    assert_image(joint_img, expected_image)
 
 
 def test_joint_nest():
     from image_jointer import JointAlign, ImageJointer
     from PIL import Image
-    import numpy as np
 
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     green = Image.new("RGBA", (100, 100), (0, 255, 0))
@@ -154,7 +56,7 @@ def test_joint_nest():
         .joint(JointAlign.UNDER_LEFT, ImageJointer(blue).joint(JointAlign.SIDE_CENTER, blue))
     )
     nest0_image = nest0.to_image()
-    nest0_image.save(IMAGE_FOLDER / "joint" / "nest.png")
+    nest0_image.save(IMAGE_FOLDER / "nest" / "Nest_test.png")
 
     nest1 = (
         ImageJointer()
@@ -163,32 +65,32 @@ def test_joint_nest():
     )
     nest1_image = nest1.to_image()
 
-    assert np.array_equal(np.asarray(nest0_image), np.asarray(nest1_image))
+    expected_image = Image.open(IMAGE_FOLDER / "nest" / "Nest_expected.png")
+
+    assert_image(nest0_image, nest1_image)
+    assert_image(nest0_image, expected_image)
 
 
 def test_joint_multiple_input():
     from image_jointer import JointAlign, ImageJointer
     from PIL import Image
-    import numpy as np
 
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     green = Image.new("RGBA", (100, 100), (0, 255, 0))
     blue = Image.new("RGBA", (100, 100), (0, 0, 255))
 
-    multiple0 = ImageJointer().joint(JointAlign.SIDE_CENTER, red, green, blue)
-    multiple0_image = multiple0.to_image()
-    multiple0_image.save(IMAGE_FOLDER / "joint" / "multiple_input.png")
+    multiple = ImageJointer().joint(JointAlign.SIDE_CENTER, red, green, blue)
+    multiple_image = multiple.to_image()
+    multiple_image.save(IMAGE_FOLDER / "multiple" / "MultipleInput_test.png")
 
-    multiple1 = ImageJointer().joint(JointAlign.SIDE_CENTER, *(red, green, blue))
-    multiple1_image = multiple1.to_image()
+    expected_image = Image.open(IMAGE_FOLDER / "multiple" / "MultipleInput_expected.png")
 
-    assert np.array_equal(np.asarray(multiple0_image), np.asarray(multiple1_image))
+    assert_image(multiple_image, expected_image)
 
 
 def test_blank():
     from image_jointer import JointAlign, ImageJointer, Blank
     from PIL import Image
-    import numpy as np
 
     red = Image.new("RGB", (100, 100), (255, 0, 0))
     blank = Blank(50, 100)
@@ -198,10 +100,6 @@ def test_blank():
     joint_img = jointed.to_image()
     joint_img.save(IMAGE_FOLDER / "blank" / "Blank.png")
 
-    correct_array = np.zeros((100, 250, 4), dtype=np.uint8)
-    correct_array[0:100, 0:100, 0] = 255
-    correct_array[0:100, 0:100, 3] = 255
-    correct_array[0:100, 150:250, 1] = 255
-    correct_array[0:100, 150:250, 3] = 255
+    expected_image = Image.open(IMAGE_FOLDER / "blank" / "Blank.png")
 
-    assert np.array_equal(np.asarray(joint_img), correct_array)
+    assert_image(joint_img, expected_image)
