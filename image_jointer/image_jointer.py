@@ -143,6 +143,20 @@ class ImageJointer(Figure):
             case Image.Image():
                 image = ImageAdapter(image)
 
+        match align:
+            case JointAlignment.UP_LEFT:
+                return ImageJointer().joint(JointAlignment.DOWN_LEFT, image, self)
+            case JointAlignment.UP_CENTER:
+                return ImageJointer().joint(JointAlignment.DOWN_CENTER, image, self)
+            case JointAlignment.UP_RIGHT:
+                return ImageJointer().joint(JointAlignment.DOWN_RIGHT, image, self)
+            case JointAlignment.LEFT_TOP:
+                return ImageJointer().joint(JointAlignment.RIGHT_TOP, image, self)
+            case JointAlignment.LEFT_CENTER:
+                return ImageJointer().joint(JointAlignment.RIGHT_CENTER, image, self)
+            case JointAlignment.LEFT_BOTTOM:
+                return ImageJointer().joint(JointAlignment.RIGHT_BOTTOM, image, self)
+
         offset = self.__calc_absolute_paste_pos(align, image)
         shift_to = self.__calc_shift(offset)
         paste_to = self.__calc_paste(offset)

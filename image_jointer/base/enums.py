@@ -10,17 +10,17 @@ class JointAlignment(Enum):
        YYY: alignment line
     """
 
-    # UP_LEFT = auto()
-    # UP_CENTER = auto()
-    # UP_RIGHT = auto()
+    UP_LEFT = auto()
+    UP_CENTER = auto()
+    UP_RIGHT = auto()
 
     DOWN_LEFT = auto()
     DOWN_CENTER = auto()
     DOWN_RIGHT = auto()
 
-    # LEFT_TOP = auto()
-    # LEFT_CENTER = auto()
-    # LEFT_BOTTOM = auto()
+    LEFT_TOP = auto()
+    LEFT_CENTER = auto()
+    LEFT_BOTTOM = auto()
 
     RIGHT_TOP = auto()
     RIGHT_CENTER = auto()
