@@ -63,31 +63,31 @@ class ImageJointer(Figure):
     def height(self) -> int:
         return self.__height
 
-    def paste(self, paste_to: Vector):
+    def _paste(self, paste_to: Vector):
         for part in self.__parts:
-            yield part.move(paste_to)
+            yield part.shift(paste_to)
 
-    def draw(self, output: Image.Image, pos: Vector):
+    def _draw(self, output: Image.Image, pos: Vector):
         for part in self.__parts:
             part.draw(output)
 
-    def __calc_shift(self, apos: Vector) -> Vector:
+    def __calc_shift(self, diff: Vector) -> Vector:
         """
         Calculate shift position for primary part from absolute paste position.
         To image centering, if secondary part is larger than primary part,
         we need to move primary part from original position to acquire gap.
         In such situation, this function returns desired position shift length.
         """
-        return Vector(-min(0, apos.x), -min(0, apos.y))
+        return Vector(-min(0, diff.x), -min(0, diff.y))
 
-    def __calc_paste(self, apos: Vector):
+    def __calc_paste(self, diff: Vector) -> Vector:
         """
         Calculate paste position for secondary part from absolute paste position.
         To image centering, if primary part is larger than secondary part,
         we need to take gap from original position.
         In such situation, this function returns desired paste position.
         """
-        return Vector(+max(0, apos.x), +max(0, apos.y))
+        return Vector(+max(0, diff.x), +max(0, diff.y))
 
     def __calc_absolute_paste_pos(self, align: JointAlign, image: Figure) -> Vector:
         """
@@ -116,10 +116,10 @@ class ImageJointer(Figure):
             case _ as unreachable:
                 assert_never(unreachable)
 
-    def __run_joint(self, image: Figure, move_to: Vector, paste_to: Vector):
+    def __run_joint(self, image: Figure, shift_to: Vector, paste_to: Vector):
         for tmp in self.__parts:
-            yield tmp.move(move_to)
-        yield from image.paste(paste_to)
+            yield tmp.shift(shift_to)
+        yield from image._paste(paste_to)
 
     def joint_single(self, align: JointAlign, image: Image.Image | Figure) -> ImageJointer:
         """

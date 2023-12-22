@@ -20,8 +20,8 @@ class ImageAdapter(Figure):
     def height(self) -> int:
         return self.image.height
 
-    def paste(self, pos: Vector) -> Generator[_Part, None, None]:
+    def _paste(self, pos: Vector) -> Generator[_Part, None, None]:
         yield _Part(self, pos)
 
-    def draw(self, output: Image.Image, pos: Vector):
+    def _draw(self, output: Image.Image, pos: Vector):
         output.paste(self.image, (pos.x, pos.y))

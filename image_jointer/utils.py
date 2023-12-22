@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from PIL import Image
+
 from .base.blank import Blank
 from .base.enums import JointAlign, PositionAlign
 from .base.figure import Figure
@@ -13,7 +15,7 @@ class Utility(object):
         raise NotImplementedError("Cannot construct")
 
     @staticmethod
-    def unify_image_size(align: PositionAlign, *inputs: Figure):
+    def unify_image_size(align: PositionAlign, *images: Image.Image | Figure):
         """
         All image will be unified to maximum width and heigh.
         Add transparent padding if image width (height) is smaller then maximum width (height).
@@ -25,8 +27,8 @@ class Utility(object):
         Returns:
             tuple[ImageJointer]: tuple of adjusted image
         """
-        width = max(element.width for element in inputs)
-        height = max(element.height for element in inputs)
+        width = max(element.width for element in images)
+        height = max(element.height for element in images)
 
         match align:
             case PositionAlign.TOP_LEFT:
@@ -59,5 +61,5 @@ class Utility(object):
 
         return tuple(
             ImageJointer(Blank(0, height)).joint(height_align, element).joint(width_align, Blank(width, 0))
-            for element in inputs
+            for element in images
         )

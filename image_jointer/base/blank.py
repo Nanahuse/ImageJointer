@@ -20,8 +20,8 @@ class Blank(Figure):
     def height(self) -> int:
         return self._height
 
-    def paste(self, pos: Vector):
+    def _paste(self, pos: Vector):
         yield _Part(self, pos)
 
-    def draw(self, output: Image.Image, pos: Vector):
+    def _draw(self, output: Image.Image, pos: Vector):
         pass
