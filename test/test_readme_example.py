@@ -1,3 +1,8 @@
+# Copyright (c) 2023 Nanahuse
+# This software is released under the MIT License
+# https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
+
+
 def test_example0():
     from image_jointer import JointAlignment, ImageJointer
     from PIL import Image

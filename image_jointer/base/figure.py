@@ -1,3 +1,7 @@
+# Copyright (c) 2023 Nanahuse
+# This software is released under the MIT License
+# https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
+
 from __future__ import annotations
 
 from abc import ABC, abstractproperty, abstractmethod
