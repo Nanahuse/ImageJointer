@@ -3,11 +3,11 @@
 # https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
 
 from __future__ import annotations
-from typing import assert_never
 
 from PIL import Image
 
-from .base.enums import JointAlign
+from .base.blank import Blank
+from .base.enums import JointAlignment
 from .base.figure import Figure
 from .base.adapter import ImageAdapter
 from .base.part import _Part
@@ -47,14 +47,6 @@ class ImageJointer(Figure):
                 self.__width = source.width
                 self.__height = source.height
 
-    @classmethod
-    def __make_from_tuple(cls, parts: tuple[_Part, ...]) -> ImageJointer:
-        instance = ImageJointer()
-        instance.__parts = parts
-        instance.__width = max(part.position.x + part.width for part in instance.__parts)
-        instance.__height = max(part.position.y + part.height for part in instance.__parts)
-        return instance
-
     @property
     def width(self) -> int:
         return self.__width
@@ -63,71 +55,51 @@ class ImageJointer(Figure):
     def height(self) -> int:
         return self.__height
 
-    def _paste(self, paste_to: Vector):
+    def _paste(self, position: Vector):
         for part in self.__parts:
-            yield part.shift(paste_to)
+            yield part.paste(position)
 
-    def _draw(self, output: Image.Image, pos: Vector):
+    def _draw(self, output: Image.Image, position: Vector):
         for part in self.__parts:
             part.draw(output)
 
-    def __calc_shift(self, diff: Vector) -> Vector:
+    def __calc_paste_pos(self, alignment: JointAlignment, paste_image: Figure) -> Vector:
         """
-        Calculate shift position for primary part from absolute paste position.
-        To image centering, if secondary part is larger than primary part,
-        we need to move primary part from original position to acquire gap.
-        In such situation, this function returns desired position shift length.
+        Calculate paste position.
+        origin is left top corner of self.
+        width is x direction (to right). height is y direction (to down).
+        paste position is always x>=0 and y>= 0. it means self width(height) is never smaller than paste_image.
+        only consider jointing at right or down direction.
         """
-        return Vector(-min(0, diff.x), -min(0, diff.y))
-
-    def __calc_paste(self, diff: Vector) -> Vector:
-        """
-        Calculate paste position for secondary part from absolute paste position.
-        To image centering, if primary part is larger than secondary part,
-        we need to take gap from original position.
-        In such situation, this function returns desired paste position.
-        """
-        return Vector(+max(0, diff.x), +max(0, diff.y))
-
-    def __calc_absolute_paste_pos(self, align: JointAlign, image: Figure) -> Vector:
-        """
-        Calculate absolute paste position from desired alignment.
-        Despite of real image area,
-        We assume infinite =(-inf, +inf) area for images in this function.
-        We call this imaginary position as absolute paste position.
-        But this assume is not real condition
-        so we need to calculate real relative moves
-        from this positions for primary/secondary parts.
-        Such conversion is implemented as calc_shift() and calc_paste().
-        """
-        match align:
-            case JointAlign.SIDE_TOP:
+        match alignment:
+            case JointAlignment.RIGHT_TOP:
                 return Vector(self.width, 0)
-            case JointAlign.SIDE_CENTER:
-                return Vector(self.width, (self.height - image.height) // 2)
-            case JointAlign.SIDE_BOTTOM:
-                return Vector(self.width, self.height - image.height)
-            case JointAlign.UNDER_LEFT:
-                return Vector(0, self.height)
-            case JointAlign.UNDER_CENTER:
-                return Vector((self.width - image.width) // 2, self.height)
-            case JointAlign.UNDER_RIGHT:
-                return Vector(self.width - image.width, self.height)
-            case _ as unreachable:
-                assert_never(unreachable)
+            case JointAlignment.RIGHT_CENTER:
+                return Vector(self.width, (self.height - paste_image.height) // 2)
+            case JointAlignment.RIGHT_BOTTOM:
+                return Vector(self.width, self.height - paste_image.height)
 
-    def __run_joint(self, image: Figure, shift_to: Vector, paste_to: Vector):
-        for tmp in self.__parts:
-            yield tmp.shift(shift_to)
+            case JointAlignment.DOWN_LEFT:
+                return Vector(0, self.height)
+            case JointAlignment.DOWN_CENTER:
+                return Vector((self.width - paste_image.width) // 2, self.height)
+            case JointAlignment.DOWN_RIGHT:
+                return Vector(self.width - paste_image.width, self.height)
+
+            case _:
+                raise ValueError("alignment is invalid")
+
+    def __run_joint(self, image: Figure, paste_to: Vector):
+        yield from self.__parts
         yield from image._paste(paste_to)
 
-    def joint_single(self, align: JointAlign, image: Image.Image | Figure) -> ImageJointer:
+    def __joint_single(self, alignment: JointAlignment, image: Image.Image | Figure) -> ImageJointer:
         """
-        Joint new image to right side or bottom.
+        Joint image.
         There are no side effect.
 
         Args:
-            align (JointAlign): how to align image
+            alignment (JointAlignment): how to align image
 
             image (Image.Image | Figure): image to joint
 
@@ -136,22 +108,58 @@ class ImageJointer(Figure):
         """
         if not isinstance(image, (Image.Image, Figure)):
             raise ValueError("Image is invalid type")
-        if not isinstance(align, JointAlign):
-            raise ValueError("align is invalid type")
+        if not isinstance(alignment, JointAlignment):
+            raise ValueError("alignment is invalid type")
 
+        # apply adapter
         match image:
             case Image.Image():
                 image = ImageAdapter(image)
 
-        offset = self.__calc_absolute_paste_pos(align, image)
-        shift_to = self.__calc_shift(offset)
-        paste_to = self.__calc_paste(offset)
-        parts = tuple(self.__run_joint(image, shift_to, paste_to))
-        return ImageJointer.__make_from_tuple(parts)
+        # only consider jointing at right or down direction.
+        # if not, swap self and image for changing direction.
+        match alignment:
+            case JointAlignment.UP_LEFT:
+                return ImageJointer(image).__joint_single(JointAlignment.DOWN_LEFT, self)
+            case JointAlignment.UP_CENTER:
+                return ImageJointer(image).__joint_single(JointAlignment.DOWN_CENTER, self)
+            case JointAlignment.UP_RIGHT:
+                return ImageJointer(image).__joint_single(JointAlignment.DOWN_RIGHT, self)
+
+            case JointAlignment.LEFT_TOP:
+                return ImageJointer(image).__joint_single(JointAlignment.RIGHT_TOP, self)
+            case JointAlignment.LEFT_CENTER:
+                return ImageJointer(image).__joint_single(JointAlignment.RIGHT_CENTER, self)
+            case JointAlignment.LEFT_BOTTOM:
+                return ImageJointer(image).__joint_single(JointAlignment.RIGHT_BOTTOM, self)
+
+        # only consider jointing image to larger or equal size base_image.
+        # if not, extend base_image size at first.
+        match alignment:
+            case JointAlignment.RIGHT_TOP | JointAlignment.RIGHT_CENTER | JointAlignment.RIGHT_BOTTOM:
+                if self.height >= image.height:
+                    base_image = self
+                else:
+                    base_image = ImageJointer(Blank(0, image.height)).__joint_single(alignment, self)
+            case JointAlignment.DOWN_LEFT | JointAlignment.DOWN_CENTER | JointAlignment.DOWN_RIGHT:
+                if self.width >= image.width:
+                    base_image = self
+                else:
+                    base_image = ImageJointer(Blank(image.width, 0)).__joint_single(alignment, self)
+
+        paste_to = base_image.__calc_paste_pos(alignment, image)
+
+        # make output
+        output = ImageJointer()
+        output.__parts = tuple(base_image.__run_joint(image, paste_to))
+        output.__width = max(base_image.width, image.width + paste_to.x)
+        output.__height = max(base_image.height, image.height + paste_to.y)
+
+        return output
 
     def joint(
         self,
-        align: JointAlign,
+        alignment: JointAlignment,
         *images: Image.Image | Figure,
     ) -> ImageJointer:
         """
@@ -159,7 +167,7 @@ class ImageJointer(Figure):
         There are no side effect.
 
         Args:
-            align (JointAlign): how to align image
+            alignment (JointAlignment): how to align image
 
             *images (Image.Image | Figure): images to joint
 
@@ -168,7 +176,7 @@ class ImageJointer(Figure):
         """
         jointed = self
         for element in images:
-            jointed = jointed.joint_single(align, element)
+            jointed = jointed.__joint_single(alignment, element)
         return jointed
 
     def to_image(self):

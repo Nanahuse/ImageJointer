@@ -1,15 +1,9 @@
-# ImageJointer
+# Copyright (c) 2023 Nanahuse
+# This software is released under the MIT License
+# https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
 
-Build up image by jointing images
 
-## install 
-```
-pip install image_jointer
-```
-
-## how to use
-
-```python
+def test_example0():
     from image_jointer import JointAlignment, ImageJointer
     from PIL import Image
 
@@ -19,28 +13,27 @@ pip install image_jointer
 
     jointed = ImageJointer().joint(JointAlignment.RIGHT_CENTER, red, green, blue)
     joint_img = jointed.to_image()
-```
 
-![example0](./doc/example0.png)
+    # -------------------------------------------
+    joint_img.save("./doc/example0.png")
 
-```python
-    from image_jointer import JointAlign, ImageJointer, Blank
-    from PIL import Image    
+
+def test_example1():
+    from image_jointer import JointAlignment, ImageJointer, Blank
+    from PIL import Image
 
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     blank = Blank(50, 100)
     green = Image.new("RGBA", (100, 100), (0, 255, 0))
 
-    jointed = (
-        ImageJointer(red)
-        .joint(blank, JointAlign.RIGHT_CENTER)
-        .joint(green, JointAlign.RIGHT_CENTER)
-    )
+    jointed = ImageJointer().joint(JointAlignment.RIGHT_CENTER, red, blank, green)
     joint_img = jointed.to_image()
-```
-![example1](./doc/example1.png)
 
-```python
+    # -------------------------------------------
+    joint_img.save("./doc/example1.png")
+
+
+def test_example2():
     from image_jointer import JointAlignment, ImageJointer
     from PIL import Image
 
@@ -50,5 +43,6 @@ pip install image_jointer
 
     jointed = ImageJointer(red).joint(JointAlignment.LEFT_BOTTOM, blue).joint(JointAlignment.DOWN_CENTER, green)
     joint_img = jointed.to_image()
-```
-![example2](./doc/example2.png)
+
+    # -------------------------------------------
+    joint_img.save("./doc/example2.png")

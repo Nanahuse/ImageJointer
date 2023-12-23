@@ -7,7 +7,7 @@ from pathlib import Path
 
 from assert_image import assert_image
 
-from image_jointer import JointAlign
+from image_jointer import JointAlignment
 
 
 IMAGE_FOLDER = Path("./test/image/")
@@ -21,9 +21,9 @@ def test_vector():
 
 @pytest.mark.parametrize(
     "alignment",
-    (alignment for alignment in JointAlign),
+    (alignment for alignment in JointAlignment),
 )
-def test_joint_alignment(alignment: JointAlign):
+def test_joint_alignment(alignment: JointAlignment):
     from image_jointer import ImageJointer
     from PIL import Image
 
@@ -43,7 +43,7 @@ def test_joint_alignment(alignment: JointAlign):
 
 
 def test_joint_nest():
-    from image_jointer import JointAlign, ImageJointer
+    from image_jointer import JointAlignment, ImageJointer
     from PIL import Image
 
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
@@ -52,16 +52,16 @@ def test_joint_nest():
 
     nest0 = (
         ImageJointer(red)
-        .joint(JointAlign.SIDE_CENTER, green)
-        .joint(JointAlign.UNDER_LEFT, ImageJointer(blue).joint(JointAlign.SIDE_CENTER, blue))
+        .joint(JointAlignment.RIGHT_CENTER, green)
+        .joint(JointAlignment.DOWN_LEFT, ImageJointer(blue).joint(JointAlignment.RIGHT_CENTER, blue))
     )
     nest0_image = nest0.to_image()
     nest0_image.save(IMAGE_FOLDER / "nest" / "Nest_test.png")
 
     nest1 = (
         ImageJointer()
-        .joint(JointAlign.SIDE_CENTER, ImageJointer(red).joint(JointAlign.UNDER_CENTER, blue))
-        .joint(JointAlign.SIDE_CENTER, ImageJointer(green).joint(JointAlign.UNDER_CENTER, blue))
+        .joint(JointAlignment.RIGHT_CENTER, ImageJointer(red).joint(JointAlignment.DOWN_CENTER, blue))
+        .joint(JointAlignment.RIGHT_CENTER, ImageJointer(green).joint(JointAlignment.DOWN_CENTER, blue))
     )
     nest1_image = nest1.to_image()
 
@@ -72,14 +72,14 @@ def test_joint_nest():
 
 
 def test_joint_multiple_input():
-    from image_jointer import JointAlign, ImageJointer
+    from image_jointer import JointAlignment, ImageJointer
     from PIL import Image
 
     red = Image.new("RGBA", (100, 100), (255, 0, 0))
     green = Image.new("RGBA", (100, 100), (0, 255, 0))
     blue = Image.new("RGBA", (100, 100), (0, 0, 255))
 
-    multiple = ImageJointer().joint(JointAlign.SIDE_CENTER, red, green, blue)
+    multiple = ImageJointer().joint(JointAlignment.RIGHT_CENTER, red, green, blue)
     multiple_image = multiple.to_image()
     multiple_image.save(IMAGE_FOLDER / "multiple" / "MultipleInput_test.png")
 
@@ -89,14 +89,14 @@ def test_joint_multiple_input():
 
 
 def test_blank():
-    from image_jointer import JointAlign, ImageJointer, Blank
+    from image_jointer import JointAlignment, ImageJointer, Blank
     from PIL import Image
 
     red = Image.new("RGB", (100, 100), (255, 0, 0))
     blank = Blank(50, 100)
     green = Image.new("RGB", (100, 100), (0, 255, 0))
 
-    jointed = ImageJointer().joint(JointAlign.SIDE_CENTER, red, blank, green)
+    jointed = ImageJointer().joint(JointAlignment.RIGHT_CENTER, red, blank, green)
     joint_img = jointed.to_image()
     joint_img.save(IMAGE_FOLDER / "blank" / "Blank.png")
 
