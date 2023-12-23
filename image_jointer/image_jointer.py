@@ -3,7 +3,6 @@
 # https://github.com/Nanahuse/ImageJointer/blob/main/LICENSE
 
 from __future__ import annotations
-from typing import assert_never
 
 from PIL import Image
 
@@ -85,8 +84,6 @@ class ImageJointer(Figure):
                 return Vector((self.width - paste_image.width) // 2, self.height)
             case JointAlignment.DOWN_RIGHT:
                 return Vector(self.width - paste_image.width, self.height)
-            case _ as unreachable:
-                assert_never(unreachable)
 
     def __run_joint(self, image: Figure, paste_to: Vector):
         yield from self.__parts
