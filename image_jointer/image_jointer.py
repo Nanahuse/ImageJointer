@@ -118,7 +118,7 @@ class ImageJointer(Figure):
 
     def __run_joint(self, image: Figure, shift_to: Vector, paste_to: Vector):
         for tmp in self.__parts:
-            yield tmp.shift(shift_to)
+            yield tmp.paste(shift_to)
         yield from image._paste(paste_to)
 
     def joint_single(self, align: JointAlignment, image: Image.Image | Figure) -> ImageJointer:
