@@ -86,6 +86,9 @@ class ImageJointer(Figure):
             case JointAlignment.DOWN_RIGHT:
                 return Vector(self.width - paste_image.width, self.height)
 
+            case _:
+                raise ValueError("alignment is invalid")
+
     def __run_joint(self, image: Figure, paste_to: Vector):
         yield from self.__parts
         yield from image._paste(paste_to)
