@@ -55,11 +55,11 @@ class ImageJointer(Figure):
     def height(self) -> int:
         return self.__height
 
-    def _paste(self, paste_to: Vector):
+    def _paste(self, position: Vector):
         for part in self.__parts:
-            yield part.paste(paste_to)
+            yield part.paste(position)
 
-    def _draw(self, output: Image.Image, pos: Vector):
+    def _draw(self, output: Image.Image, position: Vector):
         for part in self.__parts:
             part.draw(output)
 
@@ -69,6 +69,7 @@ class ImageJointer(Figure):
         origin is left top corner of self.
         width is x direction (to right). height is y direction (to down).
         paste position is always x>=0 and y>= 0. it means self width(height) is never smaller than paste_image.
+        only consider jointing at right or down direction.
         """
         match alignment:
             case JointAlignment.RIGHT_TOP:

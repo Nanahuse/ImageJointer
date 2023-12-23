@@ -3,7 +3,7 @@ from enum import Enum, auto
 
 class JointAlignment(Enum):
     """
-    Relative position to the source image.
+    How to joint new image to base image.
 
     XXX_YYY
     -> XXX: joint direction

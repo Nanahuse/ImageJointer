@@ -21,9 +21,9 @@ class Figure(ABC):
         ...
 
     @abstractmethod
-    def _paste(self, pos: Vector) -> Generator[_Part, None, None]:
+    def _paste(self, position: Vector) -> Generator[_Part, None, None]:
         ...
 
     @abstractmethod
-    def _draw(self, output: Image.Image, pos: Vector):
+    def _draw(self, output: Image.Image, position: Vector):
         ...

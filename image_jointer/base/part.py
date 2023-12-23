@@ -19,8 +19,8 @@ class _Part:
     def height(self) -> int:
         return self.source.height
 
-    def paste(self, shift_to: Vector):
-        return _Part(self.source, self.position + shift_to)
+    def paste(self, position: Vector):
+        return _Part(self.source, self.position + position)
 
     def draw(self, output: Image.Image):
         self.source._draw(output, self.position)
