@@ -92,7 +92,7 @@ class ImageJointer(Figure):
         yield from self.__parts
         yield from image._paste(paste_to)
 
-    def joint_single(self, alignment: JointAlignment, image: Image.Image | Figure) -> ImageJointer:
+    def __joint_single(self, alignment: JointAlignment, image: Image.Image | Figure) -> ImageJointer:
         """
         Joint image.
         There are no side effect.
@@ -119,18 +119,18 @@ class ImageJointer(Figure):
         # if not, swap self and image for changing direction.
         match alignment:
             case JointAlignment.UP_LEFT:
-                return ImageJointer(image).joint_single(JointAlignment.DOWN_LEFT, self)
+                return ImageJointer(image).__joint_single(JointAlignment.DOWN_LEFT, self)
             case JointAlignment.UP_CENTER:
-                return ImageJointer(image).joint_single(JointAlignment.DOWN_CENTER, self)
+                return ImageJointer(image).__joint_single(JointAlignment.DOWN_CENTER, self)
             case JointAlignment.UP_RIGHT:
-                return ImageJointer(image).joint_single(JointAlignment.DOWN_RIGHT, self)
+                return ImageJointer(image).__joint_single(JointAlignment.DOWN_RIGHT, self)
 
             case JointAlignment.LEFT_TOP:
-                return ImageJointer(image).joint_single(JointAlignment.RIGHT_TOP, self)
+                return ImageJointer(image).__joint_single(JointAlignment.RIGHT_TOP, self)
             case JointAlignment.LEFT_CENTER:
-                return ImageJointer(image).joint_single(JointAlignment.RIGHT_CENTER, self)
+                return ImageJointer(image).__joint_single(JointAlignment.RIGHT_CENTER, self)
             case JointAlignment.LEFT_BOTTOM:
-                return ImageJointer(image).joint_single(JointAlignment.RIGHT_BOTTOM, self)
+                return ImageJointer(image).__joint_single(JointAlignment.RIGHT_BOTTOM, self)
 
         # only consider jointing image to larger or equal size base_image.
         # if not, extend base_image size at first.
@@ -139,12 +139,12 @@ class ImageJointer(Figure):
                 if self.height >= image.height:
                     base_image = self
                 else:
-                    base_image = ImageJointer(Blank(0, image.height)).joint_single(alignment, self)
+                    base_image = ImageJointer(Blank(0, image.height)).__joint_single(alignment, self)
             case JointAlignment.DOWN_LEFT | JointAlignment.DOWN_CENTER | JointAlignment.DOWN_RIGHT:
                 if self.width >= image.width:
                     base_image = self
                 else:
-                    base_image = ImageJointer(Blank(image.width, 0)).joint_single(alignment, self)
+                    base_image = ImageJointer(Blank(image.width, 0)).__joint_single(alignment, self)
 
         paste_to = base_image.__calc_paste_pos(alignment, image)
 
@@ -175,7 +175,7 @@ class ImageJointer(Figure):
         """
         jointed = self
         for element in images:
-            jointed = jointed.joint_single(align, element)
+            jointed = jointed.__joint_single(align, element)
         return jointed
 
     def to_image(self):
