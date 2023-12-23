@@ -96,7 +96,7 @@ class ImageJointer(Figure):
         There are no side effect.
 
         Args:
-            align (JointAlignment): how to align image
+            alignment (JointAlignment): how to align image
 
             image (Image.Image | Figure): image to joint
 
@@ -156,7 +156,7 @@ class ImageJointer(Figure):
 
     def joint(
         self,
-        align: JointAlignment,
+        alignment: JointAlignment,
         *images: Image.Image | Figure,
     ) -> ImageJointer:
         """
@@ -164,7 +164,7 @@ class ImageJointer(Figure):
         There are no side effect.
 
         Args:
-            align (JointAlignment): how to align image
+            alignment (JointAlignment): how to align image
 
             *images (Image.Image | Figure): images to joint
 
@@ -173,7 +173,7 @@ class ImageJointer(Figure):
         """
         jointed = self
         for element in images:
-            jointed = jointed.__joint_single(align, element)
+            jointed = jointed.__joint_single(alignment, element)
         return jointed
 
     def to_image(self):
