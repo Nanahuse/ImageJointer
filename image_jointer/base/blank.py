@@ -1,27 +1,29 @@
-from dataclasses import dataclass
-
 from PIL import Image
 
-from .part import _Part
 from .figure import Figure
 from .vector import Vector
 
 
-@dataclass(frozen=True)
 class Blank(Figure):
-    _width: int
-    _height: int
+    def __init__(self, width: int, height: int) -> None:
+        if not isinstance(width, int):
+            pass
+        if not isinstance(height, int):
+            pass
+
+        self.__width = width
+        self.__height = height
 
     @property
     def width(self) -> int:
-        return self._width
+        return self.__width
 
     @property
     def height(self) -> int:
-        return self._height
+        return self.__height
 
-    def _paste(self, pos: Vector):
-        yield _Part(self, pos)
+    def _paste(self, position: Vector):
+        yield from []
 
-    def _draw(self, output: Image.Image, pos: Vector):
+    def _draw(self, output: Image.Image, position: Vector):
         pass

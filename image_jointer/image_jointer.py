@@ -48,14 +48,6 @@ class ImageJointer(Figure):
                 self.__width = source.width
                 self.__height = source.height
 
-    @classmethod
-    def __make_from_tuple(cls, parts: tuple[_Part, ...]) -> ImageJointer:
-        instance = ImageJointer()
-        instance.__parts = parts
-        instance.__width = max(part.position.x + part.width for part in instance.__parts)
-        instance.__height = max(part.position.y + part.height for part in instance.__parts)
-        return instance
-
     @property
     def width(self) -> int:
         return self.__width
@@ -156,8 +148,13 @@ class ImageJointer(Figure):
 
         paste_to = base_image.__calc_paste_pos(alignment, image)
 
-        parts = tuple(self.__run_joint(image, paste_to))
-        return ImageJointer.__make_from_tuple(parts)
+        # make output
+        output = ImageJointer()
+        output.__parts = tuple(base_image.__run_joint(image, paste_to))
+        output.__width = max(base_image.width, image.width + paste_to.x)
+        output.__height = max(base_image.height, image.height + paste_to.y)
+
+        return output
 
     def joint(
         self,
